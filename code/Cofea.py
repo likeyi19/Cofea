@@ -1,4 +1,3 @@
-# 这个文件用来跑先tfidf，然后pca进行聚类的工作
 import anndata as ad
 from glob import glob
 import numpy as np
