@@ -7,7 +7,6 @@ import scipy
 import statsmodels.api as sm
 import scipy.stats as ss
 from scipy.interpolate import interp1d
-import multiprocessing as mp
 from sklearn.feature_extraction.text import TfidfTransformer
 
 
@@ -81,7 +80,7 @@ def cos_sparse(count):
     print(f"processing...{count.shape[1]}/{count.shape[1]} {int((count.shape[1])/count.shape[1] * 100)}%")
     return np.array(mean),np.array(var)
 
-def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2", corr="pearson"):
+def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2", corr="pearson", pc=100):
     print(anndata)
 
     Y = np.array(anndata.X.todense()>0,dtype = 'float32')
@@ -102,7 +101,7 @@ def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2
     else:
         ATAC_count = tfidf3(ATAC_object.X.todense().T)
     count = np.array(ATAC_count)
-    count = PCA(n_components=100,random_state=int(seed_base*1000)).fit_transform(count)
+    count = PCA(n_components=pc,random_state=int(seed_base*1000)).fit_transform(count)
     print(count.shape)
     count = count.T
     nY = np.sum(count, axis=0)
