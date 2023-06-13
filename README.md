@@ -42,13 +42,13 @@ usage: cofea.py [-h]
                 [-s SEED_BASE]
 
 optional arguments:
-  -h, --help            show this help message and exit
-  -l LOAD_PATH, --load_path LOAD_PATH
-  -t TFIDF, --TFIDF TFIDF
-  -p PC, --PC PC
-  -c CORR, --corr CORR
-  -n SELECT_NUMBER, --select_number SELECT_NUMBER
-  -s SEED_BASE, --seed_base SEED_BASE
+  -h, --help           show this help message and exit
+  -l, --load_path      h5ad file storage path
+  -t, --TFIDF          TF-IDF implementation, input format is tfidfX, tfidf2 by default
+  -p, --PC             Dimension of cell-wise PCA, 100 by defult
+  -c, --corr           Correlation coefficient calculation method. PCC (Pearson correlation coefficient), CSC (Cosine correlation coefficient) and SPCC (Spearman correlation coefficient) can be selected
+  -n, --select_number  Number of selected features
+  -s, --seed_base      Random seed
 ```  
 
 ### Simulation
