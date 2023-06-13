@@ -9,9 +9,9 @@ from feature_selection import feature_selection
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--load_path', type=str,default=None, help='h5ad file storage path.')
-    parser.add_argument('-t', '--TFIDF', type=str,default="tfidf2", help='TF-IDF implementation.')
-    parser.add_argument('-p', '--PC', type=int,default=100, help='Dimension of cell-wise PCA.')
-    parser.add_argument('-c', '--corr', type=str,default="pearson", help='Correlation coefficient calculation method.')
+    parser.add_argument('-t', '--TFIDF', type=str,default="tfidf2", help='TF-IDF implementation, input format is tfidfX, tfidf2 by default.')
+    parser.add_argument('-p', '--PC', type=int,default=100, help='Dimension of cell-wise PCA, 100 by defult.')
+    parser.add_argument('-c', '--corr', type=str,default="pearson", help='Correlation coefficient calculation method. PCC (Pearson correlation coefficient), CSC (Cosine correlation coefficient) and SPCC (Spearman correlation coefficient) can be selected')
     parser.add_argument('-n', '--select_number', type=int,default=20000, help='Number of selected features.')
     parser.add_argument('-s', '--seed_base', type=int,default=2, help='Random seed.')
     opt = parser.parse_args()
