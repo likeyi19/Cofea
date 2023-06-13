@@ -8,6 +8,8 @@ import statsmodels.api as sm
 import scipy.stats as ss
 from scipy.interpolate import interp1d
 from sklearn.feature_extraction.text import TfidfTransformer
+import episcanpy.api as epi
+from statsmodels.distributions.empirical_distribution import ECDF
 
 
 # Perform Signac TF-IDF (count_mat: peak*cell)
@@ -30,9 +32,6 @@ def tfidf3(count_mat):
     return tf_idf.todense()
 
 def pearson_sparse(count, nY):
-    '''
-    count以np.array的形式存储
-    '''
     Y_mean = nY / count.shape[0]
     # mean = []
     # var = []
@@ -43,24 +42,18 @@ def pearson_sparse(count, nY):
     for i in range(count.shape[1]):
         if i % 10000 == 0:
             print(f"processing...{i}/{count.shape[1]} {int(i/count.shape[1] * 100)}%")
-        # 计算第i个peak与其他所有的相关系数，得到均值和方差
+        # calculate the mean and variance of the correlation coefficients between the ith peak and all other peaks
         X = count[:,i]
         X_new = count_new[:,i]
         a = np.dot(X_new,count_new)
         corr = a / (np.sqrt(np.multiply(np.dot(X_new, X_new),b)))
         
-        # mean.append(np.mean(corr))
-        # var.append(np.mean(corr**2))
         mean[i] = np.mean(corr)
         var[i] = np.mean(corr**2)
     print(f"processing...{count.shape[1]}/{count.shape[1]} {int((count.shape[1])/count.shape[1] * 100)}%")
-    # return np.array(mean),np.array(var)
     return mean, var
 
 def cos_sparse(count):
-    '''
-    count以np.array的形式存储
-    '''
     mean = []
     var = []
     y = count.T
@@ -69,7 +62,7 @@ def cos_sparse(count):
     for i in range(0, count.shape[1], 500):
         if i % 10000 == 0:
             print(f"processing...{i}/{count.shape[1]} {int(i/count.shape[1] * 100)}%")
-        # 计算第i个peak与其他所有的相关系数，得到均值和方差
+        # calculate the mean and variance of the correlation coefficients between the ith peak and all other peaks
         x = count[:,i:i+500].T
         xx = np.sum(x ** 2, axis=1) ** 0.5
         x = x / xx[:, np.newaxis]
@@ -86,7 +79,7 @@ def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2
     Y = np.array(anndata.X.todense()>0,dtype = 'float32')
     # Y = np.array(ATAC_all.X>0,dtype = 'float32')
     Y = scipy.sparse.csc_matrix(Y)
-    print('预选在多于{}%的细胞中开放的peak'.format(filter_para*100))
+    print('Preselect peaks that are accessible in more than {}% of cells.'.format(filter_para*100))
     peak_sum = np.sum(Y, axis=0)
     peak_sum = np.array(peak_sum).reshape(-1)
     idx = peak_sum > anndata.n_obs * filter_para
@@ -116,13 +109,12 @@ def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2
             order_count[:,i] = np.argsort(count[:,i])
         nY = np.sum(order_count, axis=0)
         peak_mean, peak_var = pearson_sparse(order_count, nY)
-    # 去除对角线影响
+    # Remove the diagona
     peak_mean = (peak_mean * ATAC_count.shape[1] - 1) / (ATAC_count.shape[1] - 1)
     peak_var = (peak_var * ATAC_count.shape[1] - 1) / (ATAC_count.shape[1] - 1)
 
     frac = 0.2
-    # 第一次拟合
-    print('第一次拟合')
+    print('First fitting.')
     sort_idx = np.argsort(peak_mean)
     peak_mean_lowess = peak_mean[sort_idx]
     peak_var_lowess = peak_var[sort_idx]
@@ -140,7 +132,7 @@ def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2
     peak_var_lowess = peak_var[sort_idx][idx_reserve]
 
     # 第二次拟合
-    print('第二次拟合')
+    print('Second fitting.')
     lowess = sm.nonparametric.lowess
     yest = lowess(exog=peak_mean_lowess, endog=peak_var_lowess, frac=frac, is_sorted=True)[:,1]
 
@@ -162,7 +154,7 @@ def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2
     peak_var_lowess = peak_var[sort_idx][idx_reserve]
 
     # 第三次拟合
-    print('第三次拟合')
+    print('Third fitting.')
     lowess = sm.nonparametric.lowess
     yest = lowess(exog=peak_mean_lowess, endog=peak_var_lowess, frac=frac, is_sorted=True)[:,1]
 
@@ -196,6 +188,93 @@ def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2
     res_select = res[res_sort_idx]
     res_select_mean, res_select_var = np.mean(np.abs(res_select)), np.var(res_select)
 
+    ATAC_object = ATAC_object[:, idx]
     ATAC_count_filter = ATAC_count[:,idx]
     
-    return(idx, ATAC_count_filter)
+    return(idx, ATAC_object, ATAC_count_filter)
+
+def HDA(anndata, select_num, filter_para):
+    print(anndata)
+
+    Y = np.array(anndata.X.todense()>0,dtype = 'float32')
+    # Y = np.array(ATAC_all.X>0,dtype = 'float32')
+    Y = scipy.sparse.csc_matrix(Y)
+    print('Preselect peaks that are accessible in more than {}% of cells.'.format(filter_para*100))
+    peak_sum = np.sum(Y, axis=0)
+    peak_sum = np.array(peak_sum).reshape(-1)
+    idx = peak_sum > anndata.n_obs * filter_para
+    ATAC_object = anndata[:, idx]
+    num1 = ATAC_object.n_vars
+    print(ATAC_object)
+
+    peak_sum = np.sum(ATAC_object.X, axis=0)
+    print(peak_sum.shape)
+    peak_sum = np.array(peak_sum).reshape(-1)
+    idx = np.argsort(peak_sum)[::-1]
+    idx = idx[:select_num]
+
+    ATAC_count = tfidf2(ATAC_object.X.todense().T).T
+    ATAC_object = ATAC_object[:, idx]
+    ATAC_count_filter = ATAC_count[:,idx]
+
+    return idx, ATAC_object, ATAC_count_filter
+
+def epiScanpy(anndata, select_num, filter_para):
+    print(anndata)
+
+    Y = np.array(anndata.X.todense()>0,dtype = 'float32')
+    # Y = np.array(ATAC_all.X>0,dtype = 'float32')
+    Y = scipy.sparse.csc_matrix(Y)
+    print('Preselect peaks that are accessible in more than {}% of cells.'.format(filter_para*100))
+    peak_sum = np.sum(Y, axis=0)
+    peak_sum = np.array(peak_sum).reshape(-1)
+    idx = peak_sum > anndata.n_obs * filter_para
+    ATAC_object = anndata[:, idx]
+    num1 = ATAC_object.n_vars
+    print(ATAC_object)
+    
+    adata = sc.AnnData(ATAC_object.X,dtype = 'float32')
+    adata.obs['label'] = list(ATAC_object.obs['label'])
+    epi.pp.filter_cells(adata, min_features=1)
+    epi.pp.filter_features(adata, min_cells=1)
+    adata.obs['log_nb_features'] = [np.log10(x) for x in adata.obs['nb_features']]
+    adata.raw = adata
+    epi.pp.variability_features(adata, nb_features=select_num)
+    idx = np.argsort(adata.var['variability_score'])[-select_num:]
+
+    ATAC_count = tfidf2(ATAC_object.X.todense().T).T
+    ATAC_object = ATAC_object[:, idx]
+    ATAC_count_filter = ATAC_count[:,idx]
+
+    return idx, ATAC_object, ATAC_count_filter
+
+def Signac(anndata, select_num, filter_para):
+    print(anndata)
+
+    Y = np.array(anndata.X.todense()>0,dtype = 'float32')
+    # Y = np.array(ATAC_all.X>0,dtype = 'float32')
+    Y = scipy.sparse.csc_matrix(Y)
+    print('Preselect peaks that are accessible in more than {}% of cells.'.format(filter_para*100))
+    peak_sum = np.sum(Y, axis=0)
+    peak_sum = np.array(peak_sum).reshape(-1)
+    idx = peak_sum > anndata.n_obs * filter_para
+    ATAC_object = anndata[:, idx]
+    num1 = ATAC_object.n_vars
+    print(ATAC_object)
+
+    ATAC_count = tfidf2(ATAC_object.X.todense().T).T
+    featurecounts = np.array(np.sum(ATAC_count, axis=0)).reshape(-1)
+    print(featurecounts.shape)
+    ecdf = ECDF(featurecounts)
+    x = np.array(featurecounts)
+    y = ecdf(x)
+    sort_idx_signac = np.argsort(y)
+    percentile_use = y[sort_idx_signac][ATAC_count.shape[1] - select_num]
+    print(percentile_use)
+    idx = y >= percentile_use
+    idx = np.where(idx)[0]
+    
+    ATAC_object = ATAC_object[:, idx]
+    ATAC_count_filter = ATAC_count[:,idx]
+
+    return idx, ATAC_object, ATAC_count_filter
