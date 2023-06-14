@@ -55,7 +55,7 @@ optional arguments:
 
 The overlapped proportion between the identified features and the ground-truth informative features offers a  intuitive and accurate metric than evaluating the performance based on downstream analysis tasks. To this end, we generated five high-fidelity scCAS datasets to enable a quantitative evaluation of feature selection methods. 
 
-Taking data set S4 as an example, we draw the visualization and UMAP of the dataset, and compare the overlapped proportion between the features selected by each method and the cell type-specific features.
+Taking S4 and S5 datasets as an example, we draw the visualization and UMAP of the dataset, and compare the overlapped proportion between the features selected by each method and the cell type-specific features.
 
 ![image](https://github.com/likeyi19/Cofea/blob/master/inst/S4.png)
 
