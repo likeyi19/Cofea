@@ -76,6 +76,7 @@ def cos_sparse(count):
 def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2", corr="pearson", pc=100):
     print(anndata)
 
+    anndata.X = scipy.sparse.csc_matrix(anndata.X)
     Y = np.array(anndata.X.todense()>0,dtype = 'float32')
     # Y = np.array(ATAC_all.X>0,dtype = 'float32')
     Y = scipy.sparse.csc_matrix(Y)
