@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     ATAC_all = sc.read_h5ad(dataset)
    
-    idx, ATAC_count_filter = feature_selection(ATAC_all, select_num, seed_base, 0.01, tfidf, corr, PC_num)
+    idx, ATAC_object, ATAC_count_filter = feature_selection(ATAC_all, select_num, seed_base, 0.01, tfidf, corr, PC_num)
 
     if not os.path.exists('./result'):
         os.makedirs('./result')
