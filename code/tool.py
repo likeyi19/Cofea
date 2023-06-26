@@ -10,7 +10,6 @@ import multiprocessing as mp
 import tempfile
 from scipy.io import mmwrite
 import subprocess
-import rpy2.rinterface as rinterface
 from sklearn.metrics import adjusted_rand_score,adjusted_mutual_info_score,homogeneity_score,normalized_mutual_info_score
 
 
@@ -293,13 +292,13 @@ def lisi_graph_py(
         str(n_cores),  # number of splits
         str(subset),
     ]
-    if verbose:
-        print(f'call {" ".join(args_int)}')
-    try:
-        subprocess.run(args_int)
-    except rinterface.embedded.RRuntimeError as ex:
-        print(f"Error computing LISI kNN graph {ex}\nSetting value to np.nan")
-        return np.nan
+    # if verbose:
+    #     print(f'call {" ".join(args_int)}')
+    # try:
+    #     subprocess.run(args_int)
+    # except rinterface.embedded.RRuntimeError as ex:
+    #     print(f"Error computing LISI kNN graph {ex}\nSetting value to np.nan")
+    #     return np.nan
 
     if verbose:
         print("LISI score estimation")
