@@ -197,6 +197,7 @@ def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2
 def HDA(anndata, select_num, filter_para):
     print(anndata)
 
+    anndata.X = scipy.sparse.csc_matrix(anndata.X)
     Y = np.array(anndata.X.todense()>0,dtype = 'float32')
     # Y = np.array(ATAC_all.X>0,dtype = 'float32')
     Y = scipy.sparse.csc_matrix(Y)
@@ -223,6 +224,7 @@ def HDA(anndata, select_num, filter_para):
 def epiScanpy(anndata, select_num, filter_para):
     print(anndata)
 
+    anndata.X = scipy.sparse.csc_matrix(anndata.X)
     Y = np.array(anndata.X.todense()>0,dtype = 'float32')
     # Y = np.array(ATAC_all.X>0,dtype = 'float32')
     Y = scipy.sparse.csc_matrix(Y)
@@ -252,6 +254,7 @@ def epiScanpy(anndata, select_num, filter_para):
 def Signac(anndata, select_num, filter_para):
     print(anndata)
 
+    anndata.X = scipy.sparse.csc_matrix(anndata.X)
     Y = np.array(anndata.X.todense()>0,dtype = 'float32')
     # Y = np.array(ATAC_all.X>0,dtype = 'float32')
     Y = scipy.sparse.csc_matrix(Y)
