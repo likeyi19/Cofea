@@ -6,6 +6,49 @@ Single-cell sequencing technologies provide a revolutionary understanding of cel
 
 ## Installation  
 
+### Environment setup
+
+1. We recommend you to build a python virtual environment with [Anaconda](https://docs.anaconda.com/free/anaconda/install/linux/).  If Anaconda (or miniconda) is already installed with Python3, skip to 2.
+
+2. Create and activate a new virtual environment:
+
+```
+$ conda create -n cofea python=3.8
+$ conda activate cofea
+```
+
+### Package installation
+
+Python packages required by Cofea are listed below:
+
+```
+1. Python 3.8.13
+2. Packages for Cofea and tutorial
+  anndata==0.8.0
+  episcanpy==0.3.2
+  h5py==3.7.0
+  hdf5storage==0.1.18
+  jupyter-contrib-core==0.4.0
+  loess==2.1.2
+  louvain==0.7.1
+  matplotlib==3.5.2
+  matplotlib-inline==0.1.3
+  memory-profiler==0.61.0
+  numba==0.55.2
+  numpy==1.22.4
+  pandas==1.4.3
+  patsy==0.5.2
+  progress==1.6
+  scanpy==1.9.1
+  scikit-learn==1.1.1
+  scipy==1.8.1
+  seaborn==0.11.2
+  statsmodels==0.13.2
+  umap-learn==0.5.3
+```
+
+Install the package and other requirements:
+
 ```  
 Package installation:
 $ git clone https://github.com/likeyi19/Cofea   
@@ -15,11 +58,11 @@ $ pip install -r requirements.txt
 
 ## Tutorial
 
-### demo
+### Demo
 
 We provide a [quick-start notebook](https://github.com/likeyi19/Cofea/blob/master/code/demo.ipynb) notebook which describes the fundamentals in detail and reproduces the results of Cofea.
 
-### cofea
+### Cofea
 
 Six parameters are required, including the path of dataset, TFIDF implementation method, number of PCS, correlation coefficient calculation method, number of selected features, and random seed. TFIDF is 'tfidf2' by default, the number of PCS is 100 by default, and the correlation coefficient is 'PCC' by default.
 
@@ -43,12 +86,18 @@ usage: cofea.py [-h]
 
 optional arguments:
   -h, --help           show this help message and exit
-  -l, --load_path      h5ad file storage path
-  -t, --TFIDF          TF-IDF implementation, input format is tfidfX, tfidf2 by default
-  -p, --PC             Dimension of cell-wise PCA, 100 by defult
-  -c, --corr           Correlation coefficient calculation method. PCC (Pearson correlation coefficient), CSC (Cosine correlation coefficient) and SPCC (Spearman correlation coefficient) can be selected
-  -n, --select_number  Number of selected features
-  -s, --seed_base      Random seed
+  -l, --load_path      str, default=None
+                       storage path of the h5ad file, which contains the peak-by-cell data to be processed.
+  -t, --TFIDF          str, default='tfidf2', options=['tfidf1', 'tfidf2', 'tfidf3']
+                       TF-IDF implementation, 'tfidf1' represents the original version of TF-IDF transformation, 'tfidf2' indicates the TF-IDF transformation used by Signac, and 'tfidf3' represents the TF-IDF transformation used by scOpen.
+  -p, --PC             int, default=100
+                       Dimension of cell-wise PCA.
+  -c, --corr           str, default='PCC', options=['PCC', 'CSC', 'SPCC']
+                       Correlation coefficient calculation method. PCC represents Pearson correlation coefficient, CSC indicates Cosine correlation coefficient and SPCC represents Spearman correlation coefficient.
+  -n, --select_number  int, default=20000
+                       Number of selected features.
+  -s, --seed_base      int, default=2
+                       Random seed.
 ```  
 
 ### Simulation
@@ -65,7 +114,9 @@ We provide a [notebook](https://github.com/likeyi19/Cofea/blob/master/code/simul
 
 From the perspective of revealing biological insights, we evaluated Cofea via several numeric experiments including cell type-specific peaks annotation and candidate enhancers identification.
 
+![image](https://github.com/likeyi19/Cofea/blob/master/inst/analysis.png)
+
 We provide a [notebook](https://github.com/likeyi19/Cofea/blob/master/code/analysis.ipynb) to analyze the sample dataset.
 
 ## Contact 
-If you have any questions, you can contact me from the email: <931818472@qq.com>
+If you have any questions, you can contact me from the email: <likeyi19@mails.tsinghua.edu.cn>
