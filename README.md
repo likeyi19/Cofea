@@ -108,7 +108,7 @@ Taking S4 and S5 datasets as an example, we draw the visualization and UMAP of t
 
 ![image](https://github.com/likeyi19/Cofea/blob/master/inst/S4.png)
 
-We provide a [notebook](https://github.com/likeyi19/Cofea/blob/master/code/simulation.ipynb) to reproduce the generation and testing process for simulation datasets
+We provide a [notebook](https://github.com/likeyi19/Cofea/blob/master/code/simulation.ipynb) to reproduce the generation and testing process for simulation datasets.
 
 ### Analysis
 
