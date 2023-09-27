@@ -127,12 +127,11 @@ def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2
     std = np.std(res)
     pvalue = ss.norm(loc=mu, scale=std).cdf(res)
     idx_remove = np.bitwise_or(pvalue < 0.05, pvalue > 0.95)
-    idx_reserve = np.bitwise_and(pvalue > 0.05, pvalue < 0.95)
+    idx_reserve = np.bitwise_and(pvalue >= 0.05, pvalue <= 0.95)
 
     peak_mean_lowess = peak_mean[sort_idx][idx_reserve]
     peak_var_lowess = peak_var[sort_idx][idx_reserve]
 
-    # 第二次拟合
     print('Second fitting.')
     lowess = sm.nonparametric.lowess
     yest = lowess(exog=peak_mean_lowess, endog=peak_var_lowess, frac=frac, is_sorted=True)[:,1]
@@ -143,18 +142,17 @@ def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2
     res = yest_all - peak_var[sort_idx]
     res_notnan = np.delete(res, np.where(np.isnan(res)))
     res[np.where(np.isnan(res))] = np.min(res_notnan)
-    # 计算res在高斯分布中的概率
+
     mu = np.mean(res_notnan)
     std = np.std(res_notnan)
 
     pvalue = ss.norm(loc=mu, scale=std).cdf(res)
     idx_remove = np.bitwise_or(pvalue < 0.05, pvalue > 0.95)
-    idx_reserve = np.bitwise_and(pvalue > 0.05, pvalue < 0.95)
+    idx_reserve = np.bitwise_and(pvalue >= 0.05, pvalue <= 0.95)
 
     peak_mean_lowess = peak_mean[sort_idx][idx_reserve]
     peak_var_lowess = peak_var[sort_idx][idx_reserve]
 
-    # 第三次拟合
     print('Third fitting.')
     lowess = sm.nonparametric.lowess
     yest = lowess(exog=peak_mean_lowess, endog=peak_var_lowess, frac=frac, is_sorted=True)[:,1]
@@ -162,11 +160,10 @@ def feature_selection(anndata, select_num, seed_base, filter_para, tfidf="tfidf2
     f = interp1d(peak_mean_lowess, yest, bounds_error=False) # 插值
     yest_all = f(peak_mean[sort_idx])
 
-    # 选择peak
     res = yest_all - peak_var[sort_idx]
     res_notnan = np.delete(res, np.where(np.isnan(res)))
     res[np.where(np.isnan(res))] = np.min(res_notnan)
-    # 计算res在高斯分布中的概率
+    
     mu = np.mean(res_notnan)
     std = np.std(res_notnan)
     pvalue = ss.norm(loc=mu, scale=std).cdf(res)
