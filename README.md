@@ -116,7 +116,7 @@ We provide a [notebook](https://github.com/likeyi19/Cofea/blob/master/code/simul
 
 From the perspective of revealing biological insights, we evaluated Cofea via several numeric experiments including cell type-specific peaks annotation and candidate enhancers identification.
 
-![image](https://github.com/likeyi19/Cofea/blob/master/inst/analysis.png)
+![image](https://github.com/likeyi19/Cofea/blob/master/inst/data analysis.png)
 
 We provide a [notebook](https://github.com/likeyi19/Cofea/blob/master/code/analysis.ipynb) to analyze the sample dataset.
 
